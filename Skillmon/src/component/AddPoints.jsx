@@ -26,7 +26,6 @@ const questions = [
       { label: "Medium", value: "medium", color: BASE_COLORS.medium },
       { label: "Critical", value: "critical", color: BASE_COLORS.critical },
     ],
-    helper: { low: "2", medium: "3", critical: "5" },
   },
   {
     label: "Is it an older lesson you are revising?",
@@ -34,8 +33,6 @@ const questions = [
     yesText: "Yes",
     noText: "No",
     multiplier: 2,
-    helper:
-      "If yes, multiply by 2 with the original score and add it to the total",
   },
   {
     label: "Did you make a video explaining the concept?",
@@ -43,8 +40,6 @@ const questions = [
     yesText: "Yes",
     noText: "No",
     multiplier: 3,
-    helper:
-      "If yes, multiply by 3 with the original score and add it to the total",
   },
   {
     label: "Did you create any diagrams or charts?",
@@ -52,8 +47,6 @@ const questions = [
     yesText: "Yes",
     noText: "No",
     multiplier: 3,
-    helper:
-      "If yes, multiply by 3 with the original score and add it to the total",
   },
   {
     label: "Any practical implementation?",
@@ -61,14 +54,11 @@ const questions = [
     yesText: "Yes",
     noText: "No",
     multiplier: 5,
-    helper:
-      "If yes, multiply by 5 with the original score and add it to the total",
   },
   {
     label: "How many times did you watch the video?",
     type: "watched",
     options: Array.from({ length: 10 }, (_, i) => i + 1),
-    helper: "Add each number to the total (1-10)",
   },
 ];
 
@@ -77,7 +67,6 @@ function getLevelFromXP(xpTable, startingLevel, currentXP) {
   let totalXP = (xpTable[startingLevel - 1] || 0) + (currentXP || 0);
   let currentLevel = startingLevel;
   const maxLevel = xpTable.length;
-
   while (currentLevel < maxLevel && totalXP >= xpTable[currentLevel]) {
     currentLevel++;
   }
@@ -107,7 +96,7 @@ function AddPoints() {
     const stored = JSON.parse(localStorage.getItem("courses") || "[]");
     const found = stored.find((c) => c.id === Number(courseId));
     if (found) setCourse(found);
-    else navigate("/"); // if not found, go home
+    else navigate("/");
   }, [courseId, navigate]);
 
   // Calculate score
@@ -138,7 +127,11 @@ function AddPoints() {
     if (!course) return;
 
     const prevXP = course.currentXP || 0;
-    const prevLevel = getLevelFromXP(course.xpTable, course.startingLevel, prevXP);
+    const prevLevel = getLevelFromXP(
+      course.xpTable,
+      course.startingLevel,
+      prevXP
+    );
 
     // Add points to course.currentXP
     const newXP = prevXP + calculated;
@@ -148,7 +141,11 @@ function AddPoints() {
     };
 
     // Calculate new level after XP
-    const newLevel = getLevelFromXP(course.xpTable, course.startingLevel, newXP);
+    const newLevel = getLevelFromXP(
+      course.xpTable,
+      course.startingLevel,
+      newXP
+    );
 
     // Replace in local storage
     const stored = JSON.parse(localStorage.getItem("courses") || "[]");
@@ -181,7 +178,7 @@ function AddPoints() {
             <label
               key={opt.value}
               className="flex items-center gap-2 cursor-pointer"
-              style={{ fontWeight: 500, fontSize: "1.15rem", color: opt.color }}
+              style={{ fontWeight: 500, fontSize: "1.13rem", color: opt.color }}
             >
               <input
                 type="radio"
@@ -194,18 +191,12 @@ function AddPoints() {
                 className="accent-slate-400 w-5 h-5"
               />
               {opt.label}
-              <span
-                style={{ color: "#b1b1b1", fontSize: "1rem", marginLeft: 4 }}
-              >
-                {q.helper[opt.value]}
-              </span>
             </label>
           ))}
         </div>
       );
     }
     if (["older", "video", "diagrams", "practical"].includes(q.type)) {
-      // Yes/No radio
       return (
         <div className="flex gap-7 mt-2 mb-2 items-center">
           <label
@@ -236,9 +227,6 @@ function AddPoints() {
             />
             No
           </label>
-          <span style={{ color: "#444", fontSize: "0.96rem", marginLeft: 14 }}>
-            {q.helper}
-          </span>
         </div>
       );
     }
@@ -258,9 +246,6 @@ function AddPoints() {
               </option>
             ))}
           </select>
-          <span style={{ color: "#222", fontSize: "0.95rem" }}>
-            Add each number to the total (1-10)
-          </span>
         </div>
       );
     }
@@ -271,15 +256,41 @@ function AddPoints() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#151a25] via-[#222b3a] to-[#314055] px-4 py-10">
+      {/* Back Button */}
+      <GlassButton
+        color="sky"
+        onClick={() => navigate("/")}
+        className="
+        absolute
+        -top-100
+        right-130
+        z-50
+        text-[1.13rem]
+        px-6
+        py-2
+        font-semibold
+        min-w-[92px]
+        tracking-wide
+        shadow-lg
+        transition
+        focus:outline-none"
+        type="button"
+      >
+        ← Back
+      </GlassButton>
+
       <form
-        className="bg-white/10 rounded-2xl px-8 py-10 max-w-2xl w-full shadow-xl border border-white/20 backdrop-blur-sm"
+        className="bg-white/10 rounded-2xl px-8 py-10 max-w-2xl w-full shadow-xl border border-white/20 backdrop-blur-sm relative"
         onSubmit={handleSubmit}
         style={{
           boxShadow: "0 6px 32px rgba(0,0,0,0.13)",
           color: "#fff",
         }}
       >
-        <h2 className="text-2xl sm:text-3xl font-extrabold text-center text-sky-300 mb-10">
+        <h2
+          className="text-2xl sm:text-3xl font-extrabold text-center text-sky-300 mb-10"
+          style={{ letterSpacing: ".01em" }}
+        >
           Add points to{" "}
           <span style={{ color: "#fff", fontWeight: 700 }}>
             {course.courseName}
@@ -292,11 +303,9 @@ function AddPoints() {
               className="text-xl sm:text-2xl font-bold mb-1"
               style={{
                 color: "#fff",
-                borderBottom:
-                  q.type === "video" || q.type === "practical"
-                    ? "2px solid #38bdf8"
-                    : "none",
                 width: "fit-content",
+                fontWeight: 700,
+                letterSpacing: "0.01em",
               }}
             >
               {q.label}

@@ -4,7 +4,7 @@ import { Plus, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import folder from "../assets/empty-folder.png";
 
-// Map Tailwind color name to actual HEX for style
+// Map Tailwind color name to actual HEX for style (stronger, more saturated glow)
 const COLOR_HEX_MAP = {
   "rose-400": "#EE6352",
   "emerald-400": "#59CD90",
@@ -12,6 +12,16 @@ const COLOR_HEX_MAP = {
   "blue-400": "#9381FF",
   "orange-400": "#28C2FF",
   "cyan-400": "#FF715B",
+};
+
+// Softer glow (transparent) for background shadow
+const COLOR_GLOW_MAP = {
+  "rose-400": "rgba(238, 99, 82, 0.34)",
+  "emerald-400": "rgba(89, 205, 144, 0.35)",
+  "amber-400": "rgba(230, 194, 41, 0.33)",
+  "blue-400": "rgba(147, 129, 255, 0.31)",
+  "orange-400": "rgba(40, 194, 255, 0.32)",
+  "cyan-400": "rgba(255, 113, 91, 0.33)",
 };
 
 function Dashboard() {
@@ -43,7 +53,6 @@ function Dashboard() {
   // Handle outside click to close either dropdown
   useEffect(() => {
     function handleClickOutside(event) {
-      // For Delete drawer
       if (
         showDeleteDropdown &&
         dropdownRef.current &&
@@ -51,7 +60,6 @@ function Dashboard() {
       ) {
         setShowDeleteDropdown(false);
       }
-      // For Add Points drawer
       if (
         showAddPointsDropdown &&
         addPointsRef.current &&
@@ -85,7 +93,6 @@ function Dashboard() {
   }, [showAddPointsDropdown, courses.length]);
 
   // Calculate current progress
-  // Corrected getProgress Function
   function getProgress(course) {
     const xpTable = Array.isArray(course.xpTable) ? course.xpTable : [];
     let totalXP =
@@ -94,14 +101,12 @@ function Dashboard() {
     let currentLevel = course.startingLevel;
     const maxLevel = xpTable.length;
 
-    // Find the correct level according to totalXP
     while (currentLevel < maxLevel && totalXP >= xpTable[currentLevel]) {
       currentLevel++;
     }
 
     const xpCurrentLevel = xpTable[currentLevel - 1] || 0;
     const xpNextLevel = xpTable[currentLevel] || xpCurrentLevel + 100;
-
     const xpIntoCurrentLevel = totalXP - xpCurrentLevel;
     const xpNeededThisLevel = xpNextLevel - xpCurrentLevel;
 
@@ -119,7 +124,6 @@ function Dashboard() {
     };
   }
 
-  // Handle course deletion with input confirmation
   function handleDeleteCourse() {
     const newCourses = courses.filter((c) => c.id !== selectedCourseId);
     localStorage.setItem("courses", JSON.stringify(newCourses));
@@ -129,10 +133,8 @@ function Dashboard() {
     setDeleteConfirmInput("");
   }
 
-  // The course the user wants to delete (object, not just id)
   const courseToDelete = courses.find((c) => c.id === selectedCourseId);
 
-  // Handler for Add Course (enforce max 3, now shows modal)
   function handleAddCourse() {
     if (courses.length >= 3) {
       setShowMaxModal(true);
@@ -141,7 +143,6 @@ function Dashboard() {
     navigate("/add-course");
   }
 
-  // Handle Add Points: navigates to add-points/:courseId
   function handleAddPoints(course) {
     setShowAddPointsDropdown(false);
     navigate(`/add-points/${course.id}`);
@@ -449,12 +450,17 @@ function Dashboard() {
               const { level, percent, xpNeededForNextLevel } =
                 getProgress(course);
               const colorHex = COLOR_HEX_MAP[course.color] || "#60a5fa";
+              const glow =
+                COLOR_GLOW_MAP[course.color] || "rgba(96, 165, 250, 0.34)";
 
               return (
                 <div
                   key={course.id}
                   className="w-full max-w-2xl px-8 py-7 rounded-2xl bg-white/5 backdrop-blur-sm shadow-2xl border border-white/10 flex flex-col gap-3"
-                  style={{ boxShadow: "0 6px 32px rgba(0,0,0,0.13)" }}
+                  style={{
+                    boxShadow: `0 0 20px 0 ${glow}, 0 4px 32px 0 rgba(0,0,0,0.13)`,
+                    transition: "box-shadow 0.4s cubic-bezier(.4,1.7,.42,1)",
+                  }}
                 >
                   <div className="flex items-center mb-2">
                     <span
@@ -507,3 +513,5 @@ function Dashboard() {
 }
 
 export default Dashboard;
+
+              
