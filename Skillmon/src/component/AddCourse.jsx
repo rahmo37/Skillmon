@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import GlassButton from "./HelperComponent/GlassButton.jsx";
+import GlassButton from "./helperComponent/GlassButton.jsx";
 import { ArrowLeft } from "lucide-react";
 
 // Color and Difficulty Configurations

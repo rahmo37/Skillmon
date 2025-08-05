@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import GlassButton from "./HelperComponent/GlassButton.jsx";
+import GlassButton from "./helperComponent/GlassButton.jsx";
 import { Plus, Trash2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import folder from "../assets/empty-folder.png";

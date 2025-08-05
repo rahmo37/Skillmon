@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import GlassButton from "./HelperComponent/GlassButton.jsx";
+import GlassButton from "./helperComponent/GlassButton.jsx";
+
 
 // Core colors for yes/no, etc.
 const YES_COLOR = "#34d399";
